@@ -1,53 +1,24 @@
-"""Getting Started Example for Python 2.7+/3.3+"""
-from boto3 import Session
-from botocore.exceptions import BotoCoreError, ClientError
-from contextlib import closing
-import os
-import sys
-import subprocess
-from tempfile import gettempdir
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
+import time
 
-# Create a client using the credentials and region defined in the [adminuser]
-# section of the AWS credentials file (~/.aws/credentials).
-session = Session(profile_name="my-dev-profile")
-polly = session.client("polly")
+def init_comment_loader():
+    global numberOfComments
+    driver = webdriver.Firefox()
+    print("webdriver initialized")
+    driver.get("https://www.youtube.com/live_chat?is_popout=1&dark_theme=1&v=Ub8YwqMKfGs")
+    print("webdriver link get")
+    initialWait = WebDriverWait(driver, 60)
+    print("webdriver waited")
+    commentsContainer = initialWait.until(expected_conditions.presence_of_element_located([By.CSS_SELECTOR, "div[id^=items]"]))
+    print(commentsContainer)
+    print("container found")
+    if commentsContainer == None:
+        print("Page unresponsive!!!")
+    time.sleep(1)
+    print(len(commentsContainer.find_elements(By.CSS_SELECTOR, "yt-live-chat-text-message-renderer")) + 1)
+    return driver
 
-try:
-    # Request speech synthesis
-    response = polly.synthesize_speech(Text="Hello world!", OutputFormat="mp3",
-                                        VoiceId="Joanna")
-except (BotoCoreError, ClientError) as error:
-    # The service returned an error, exit gracefully
-    print(error)
-    sys.exit(-1)
-
-# Access the audio stream from the response
-if "AudioStream" in response:
-    # Note: Closing the stream is important because the service throttles on the
-    # number of parallel connections. Here we are using contextlib.closing to
-    # ensure the close method of the stream object will be called automatically
-    # at the end of the with statement's scope.
-        with closing(response["AudioStream"]) as stream:
-           output = os.path.join(gettempdir(), "speech.mp3")
-
-           try:
-            # Open a file for writing the output as a binary stream
-                with open(output, "wb") as file:
-                   file.write(stream.read())
-           except IOError as error:
-              # Could not write to file, exit gracefully
-              print(error)
-              sys.exit(-1)
-
-else:
-    # The response didn't contain audio data, exit gracefully
-    print("Could not stream audio")
-    sys.exit(-1)
-
-# Play the audio using the platform's default player
-if sys.platform == "win32":
-    os.startfile(output)
-else:
-    # The following works on macOS and Linux. (Darwin = mac, xdg-open = linux).
-    opener = "open" if sys.platform == "darwin" else "xdg-open"
-    subprocess.call([opener, output])
+init_comment_loader()

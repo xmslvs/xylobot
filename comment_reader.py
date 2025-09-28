@@ -1,13 +1,16 @@
-from selenium import webdriver
+from selenium import webdriver 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+import time
+import random
 
 def init_comment_loader():
     global numberOfComments
     driver = webdriver.Firefox()
     print("webdriver initialized")
-    driver.get("https://www.youtube.com/live_chat?is_popout=1&dark_theme=1&v=Ub8YwqMKfGs")
+    driver.get("https://www.youtube.com/live_chat?is_popout=1&dark_theme=1&v=Zlh5HlKc4_U")
     print("webdriver link get")
     initialWait = WebDriverWait(driver, 60)
     print("webdriver waited")
@@ -15,19 +18,35 @@ def init_comment_loader():
     print("container found")
     if commentsContainer == None:
         print("Page unresponsive!!!")
-    numberOfComments = len(commentsContainer.find_elements(By.CSS_SELECTOR, "style-scope.yt-live-chat-item-list-renderer")) + 1
-    print("element size found")
+    time.sleep(1)
+    numberOfComments = len(commentsContainer.find_elements(By.CSS_SELECTOR, "yt-live-chat-text-message-renderer"))
+    print("element size found: " + str(numberOfComments))
     return driver
 
 
 def read_new_comment(driver):
     global numberOfComments
-    newCommentSelector = "div[id^=items] > :nth-child(" + str(numberOfComments) + " of yt-live-chat-text-message-renderer) > div[id^=content] > span[id^=message]"
-    print(newCommentSelector)
-    newComment = (WebDriverWait(driver, 6000)).until(expected_conditions.visibility_of_element_located([By.CSS_SELECTOR, newCommentSelector]))
-    print("newCommentFound")
-    numberOfComments += 1
-    print("numberOfComments incremented")
-    print(newComment.text)  #prints current user's comment
-    return newComment.text
+    newCommentText = "div[id^=items] > :nth-child(" + str(numberOfComments) + " of yt-live-chat-text-message-renderer) > div[id^=content] > span[id^=message]"
+    newCommentAuthor = "div[id^=items] > :nth-child(" + str(numberOfComments) + " of yt-live-chat-text-message-renderer) > div[id^=content] > yt-live-chat-author-chip > span[id^=author-name]"
+    print("reading comments...")
+    
+    for i in range(0, random.randint(20, 30)):
+        new_comment = driver.find_elements(By.CSS_SELECTOR, newCommentText)
+        if (len(new_comment) == 0):
+            time.sleep(1)
+        else:
+            newCommentTextData = (WebDriverWait(driver, 1)).until(expected_conditions.visibility_of_element_located([By.CSS_SELECTOR, newCommentText]))
+            newCommentAuthorData = (WebDriverWait(driver, 1)).until(expected_conditions.visibility_of_element_located([By.CSS_SELECTOR, newCommentAuthor]))
+            print("newCommentFound")
+            numberOfComments += 1
+            print("numberOfComments incremented")
+            print(newCommentAuthorData.text + ": " + newCommentTextData.text)  #prints current user's comment
+            newCommentData = [newCommentAuthorData.text, newCommentTextData.text]
+            break
+    if (len(new_comment) == 0):
+        new_comment = driver.find_elements(By.CSS_SELECTOR, newCommentText)
+        print("new comment not found, generating independent prompt")
+        newCommentData = ["", ""]
+    
+    return newCommentData
 
