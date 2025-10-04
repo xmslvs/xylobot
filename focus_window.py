@@ -2,10 +2,8 @@
 
 """
 
-import keyboard
 import win32gui
 import win32con
-import time
 
 
 

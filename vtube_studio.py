@@ -6,7 +6,7 @@ def trigger_expression(response):
     keypress = {
         'happy': "h", 
         'sad': "s", 
-        'scared': "s+c",
+        'scared': "j",
         'angry': "a", 
         'embarrassed': "e", 
         'playful': "p", 
