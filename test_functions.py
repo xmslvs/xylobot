@@ -21,4 +21,11 @@ def init_comment_loader():
     print(len(commentsContainer.find_elements(By.CSS_SELECTOR, "yt-live-chat-text-message-renderer")) + 1)
     return driver
 
-init_comment_loader()
+from gemini_llm import system_prompt, independent_prompt, gen_gemini_response
+import asyncio
+
+async def test_response():
+    input=[{"user": "test_instuctor", "response": "please become angry", "response_datetime": "Fri Oct  3 16:15:52 2025"}]
+    await gen_gemini_response(system_prompt(input, 0))
+
+asyncio.run(test_response())

@@ -10,7 +10,7 @@ def init_comment_loader():
     global numberOfComments
     driver = webdriver.Firefox()
     print("webdriver initialized")
-    driver.get("https://www.youtube.com/live_chat?is_popout=1&dark_theme=1&v=Zlh5HlKc4_U")
+    driver.get("https://www.youtube.com/live_chat?v=opTEWV_cdrg")
     print("webdriver link get")
     initialWait = WebDriverWait(driver, 60)
     print("webdriver waited")
@@ -41,12 +41,12 @@ def read_new_comment(driver):
             numberOfComments += 1
             print("numberOfComments incremented")
             print(newCommentAuthorData.text + ": " + newCommentTextData.text)  #prints current user's comment
-            newCommentData = [newCommentAuthorData.text, newCommentTextData.text]
+            newCommentData = {"user": newCommentAuthorData.text, "response": newCommentTextData.text, "response_datetime": time.ctime()}
             break
     if (len(new_comment) == 0):
         new_comment = driver.find_elements(By.CSS_SELECTOR, newCommentText)
         print("new comment not found, generating independent prompt")
-        newCommentData = ["", ""]
+        newCommentData = {"user": "","response": "", "response_datetime": time.ctime()}
     
     return newCommentData
 
