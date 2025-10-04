@@ -172,7 +172,7 @@ async def gen_gemini_response(prompt):
     response_json = dict(response_json)
     os.remove(os.path.join(current_dir, "response.txt"))
     with open("response.txt", "w") as h:
-        h.write(response_json["response"])
+        h.write(str(response_json["response"]) + "\nEmotion: "+ response_json["emotion_state"])
     return response.text
 
 
