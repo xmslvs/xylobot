@@ -10,7 +10,7 @@ def init_comment_loader():
     global numberOfComments
     driver = webdriver.Firefox()
     print("webdriver initialized")
-    driver.get("https://www.youtube.com/live_chat?v=opTEWV_cdrg")
+    driver.get("https://www.youtube.com/live_chat?v=d4L4YQ9PF4k")
     print("webdriver link get")
     initialWait = WebDriverWait(driver, 60)
     print("webdriver waited")
