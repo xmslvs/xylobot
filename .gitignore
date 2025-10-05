@@ -1,2 +1,5 @@
 API_key.py
+pyvts_token.txt
+polly_output.mp3
+test_functions.py
 __pycache__/

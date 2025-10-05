@@ -1,8 +1,7 @@
 from gemini_llm import system_prompt, independent_prompt, gen_gemini_response
 from polly_tts import speak_polly_response
 from comment_reader import init_comment_loader, read_new_comment
-from vtube_studio import trigger_expression
-from focus_window import focus_on_window
+from vtube_studio import trigger_hotkey
 import json
 import asyncio
 
@@ -23,9 +22,7 @@ async def main():
         response = await gen_gemini_response(gemini_input)
         response_elem = json.loads(response)
         past_conversation_log.append(response_elem)
-        focus_on_window("VTube Studio")
-        trigger_expression(response_elem)
-
+        await trigger_hotkey(response_elem)
         await speak_polly_response(response_elem["response"])
         print(past_conversation_log)
 

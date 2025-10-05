@@ -1,21 +1,27 @@
-import keyboard
-import time
+import pyvts
 
-def trigger_expression(response):
+async def trigger_hotkey(response):
+    vts = pyvts.vts()
+    await vts.connect()
+    await vts.request_authenticate_token()
+    await vts.request_authenticate()
     expression = response["emotion_state"] 
     keypress = {
-        'happy': "h", 
-        'sad': "s", 
-        'scared': "j",
-        'angry': "a", 
-        'embarrassed': "e", 
-        'playful': "p", 
-        'confident': "c", 
-        'loved': "l",
-        'remove': "r"
+        'happy': 'ExpHappy', 
+        'sad': 'ExpSad', 
+        'scared': 'ExpScared',
+        'angry': 'ExpAngry', 
+        'embarrassed': 'ExpEmbarrassed', 
+        'playful': 'ExpPlayful', 
+        'confident': 'ExpConfident', 
+        'loved': 'ExpLoved',
+        'remove': 'ExpRemove'
     }
-    keyboard.send(keypress['remove'], do_release=True)
-    time.sleep(0.4)
-    keyboard.send(keypress[expression], do_release=True)
+    remove_expressions = vts.vts_request.requestTriggerHotKey(keypress['remove'])
+    await vts.request(remove_expressions) # send request to remove expressions
+    print("reset expression")
+    set_expression = vts.vts_request.requestTriggerHotKey(keypress[expression])
+    await vts.request(set_expression)
     print(keypress[expression])
+    await vts.close()
 

@@ -28,4 +28,30 @@ async def test_response():
     input=[{"user": "test_instuctor", "response": "please become angry", "response_datetime": "Fri Oct  3 16:15:52 2025"}]
     await gen_gemini_response(system_prompt(input, 0))
 
-asyncio.run(test_response())
+import keyboard
+from focus_window import focus_on_window
+
+def test_emotions():
+    focus_on_window("VTube Studio")
+    time.sleep(1)
+    keypress = {
+        'happy': 23, 
+        'sad': 's', 
+        'scared': 'j',
+        'angry': 'a', 
+        'embarrassed': 'e', 
+        'playful': 'p', 
+        'confident': 'c', 
+        'loved': 'l',
+        'remove': 'r'
+    }
+    for item in keypress:
+        keyboard.send('r')
+        print("emotion removed")
+        time.sleep(0.5)
+        keyboard.send('h')
+        
+        print("emotion added")
+        time.sleep(3)rh
+
+test_emotions()
