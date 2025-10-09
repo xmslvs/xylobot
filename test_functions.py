@@ -1,3 +1,2 @@
-from screen_capture import take_screenshot
-
-take_screenshot()
+import screen_capture
+screen_capture.take_screenshot()

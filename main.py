@@ -2,6 +2,7 @@ from gemini_llm import system_prompt, independent_prompt, gen_gemini_response
 from polly_tts import speak_polly_response
 from comment_reader import init_comment_loader, read_new_comment
 from vtube_studio import trigger_hotkey
+
 import json
 import asyncio
 
@@ -25,5 +26,8 @@ async def main():
         await trigger_hotkey(response_elem)
         await speak_polly_response(response_elem["response"])
         print(past_conversation_log)
+
+# async def main():
+#     await asyncio.gather(asyncio.create_task(update_screen_history()), asyncio.create_task(control_loop()))
 
 asyncio.run(main())

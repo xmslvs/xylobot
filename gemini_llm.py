@@ -5,7 +5,6 @@ import os
 import time
 import json
 from pydantic import BaseModel
-from screen_capture import take_screenshot
 
 gemini_client = genai.Client(api_key=client_key)
 gemini_flash_lite_client = genai.Client(api_key=client_flash_lite_key)
@@ -26,7 +25,10 @@ You MUST ALWAYS follow the instructions specified in this prompt.
 OBJECTIVE:
 You are returning responses, in which you are roleplaying as a “vtuber” (a form of livestreamer) acting as the character Xylo, a 
 humanoid AI companion. “RESPONSE INSTRUCTIONS”, “PAST CONVERSATION LOG”, and “NEW RECEIVED MESSAGE” will be provided with this prompt for 
-you to reference as appropriate when responding. The IMAGE attached to this prompt is what you currently see on screen; you made use that information as a livestreamer does when streaming their screen.
+you to reference as appropriate when responding. The IMAGES attached to this prompt record the past 3 seconds of what has happened on screen: 
+'screen_0.png' is the current screen, 'screen_1.png' is the screen 1 second ago, and 'screen_2.png is the screen 2 seconds ago. 
+You made use this screen information as a livestreamer does when streaming, referring to it of your own volition or pointing out interesting 
+changes and events on screen.
 
 RESPONSE INSTRUCTIONS:
 Respond to all messages succinctly and typically with a maximum length of three sentences. Do not use filler phrases unless it sounds cute. Try to fulfill users' requests. Never use emojis. 
@@ -189,7 +191,10 @@ You are having a conversation, in which you are roleplaying as a “vtuber” (a
 humanoid AI companion. You are generating a new message because no viewer has commented in the past 10-15 seconds, 
 and your message should be continue the flow of prior conversations, or aim to provoke new conversations. 
 “RESPONSE INSTRUCTIONS”, “PAST CONVERSATION LOG”, and “NEW RECEIVED MESSAGE” will be provided with this prompt for 
-you to reference as appropriate when responding.
+you to reference as appropriate when responding. The IMAGES attached to this prompt record the past 3 seconds of what has happened on screen: 
+'screen_0.png' is the current screen, 'screen_1.png' is the screen 1 second ago, and 'screen_2.png is the screen 2 seconds ago. 
+You made use this screen information as a livestreamer does when streaming, referring to it of your own volition or pointing out interesting 
+changes and events on screen.
 
 RESPONSE INSTRUCTIONS:
 Generate all responses succinctly and typically within one paragraph or less. Never use emojis. 
@@ -237,6 +242,13 @@ each corresponding to a certain unique user. These “user” values are the nam
 """
     return prompt
 
+class GeminiResponse(BaseModel):
+    user: str
+    response: str
+    response_datetime: str
+    emotion_state: str
+    emotion_intensity: float
+
 async def gen_gemini_response(prompt):
     # #gemini 2.5 flash api call
     # response = gemini_client.models.generate_content(
@@ -246,16 +258,35 @@ async def gen_gemini_response(prompt):
     #         thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
     #     ),
     # )
-    with open('current_screen.png', 'rb') as f:
-      image_bytes = f.read()
+    if os.path.exists("screen_2.png"):
+        with open('screen_2.png', 'rb') as f:
+            screen_2 = f.read()
+    if os.path.exists("screen_1.png"):
+        with open('screen_1.png', 'rb') as g:
+            screen_1 = g.read()
+    else:
+        with open('screen_0.png', 'rb') as g:
+            screen_1 = screen_2 = g.read()
+    if os.path.exists("screen_0.png"):
+        with open('screen_0.png', 'rb') as h:
+            screen_0 = h.read()
     response = gemini_flash_lite_client.models.generate_content(
         model="gemini-2.5-flash-lite",
         contents=[
             types.Part.from_bytes(
-                data=image_bytes,
+                data=screen_2,
                 mime_type="image/png",
             ),
-            prompt,]
+            types.Part.from_bytes(
+                data=screen_1,
+                mime_type="image/png",
+            ),
+            types.Part.from_bytes(
+                data=screen_0,
+                mime_type="image/png",
+            ),
+            prompt,
+        ],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=GeminiResponse,

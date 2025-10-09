@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 import time
 import random
+from screen_capture import update_screen_history
 
 def init_comment_loader():
     global numberOfComments
@@ -33,8 +34,10 @@ def read_new_comment(driver):
     for i in range(0, random.randint(20, 30)):
         new_comment = driver.find_elements(By.CSS_SELECTOR, newCommentText)
         if (len(new_comment) == 0):
+            update_screen_history()
             time.sleep(1)
         else:
+            update_screen_history()
             newCommentTextData = (WebDriverWait(driver, 1)).until(expected_conditions.visibility_of_element_located([By.CSS_SELECTOR, newCommentText]))
             newCommentAuthorData = (WebDriverWait(driver, 1)).until(expected_conditions.visibility_of_element_located([By.CSS_SELECTOR, newCommentAuthor]))
             print("newCommentFound")

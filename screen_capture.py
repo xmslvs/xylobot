@@ -1,6 +1,17 @@
 from PIL import ImageGrab
 import win32gui
+import win32con
 import time
+import os
+
+def update_screen_history():
+        if os.path.exists("screen_2.png"):
+            os.remove("screen_2.png")
+        if os.path.exists("screen_1.png"):
+            os.rename("screen_1.png", "screen_2.png")
+        if os.path.exists("screen_0.png"):
+            os.rename("screen_0.png", "screen_1.png")
+        take_screenshot()
 
 def take_screenshot():
     toplist, winlist = [], []
@@ -11,16 +22,19 @@ def take_screenshot():
     obs_preview = [(hwnd, title) for hwnd, title in winlist if 'projector' in title.lower()]
     # just grab the hwnd for first window matching firefox
     hwnd = obs_preview[0][0]
+    orig_window = win32gui.GetForegroundWindow()
     print(obs_preview)
-
-    win32gui.SetForegroundWindow(hwnd)
+    print("top window: " + str(win32gui.GetTopWindow(hwnd)))
+    # if orig_window != hwnd:
+    #     win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+    #     win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        # win32gui.SetForegroundWindow(hwnd)
     bbox = win32gui.GetWindowRect(hwnd)
     print(bbox)
     bbox = scale_bbox(bbox)
-    time.sleep(0.1)
     img = ImageGrab.grab(bbox, all_screens=True)
     print(bbox)
-    img.save("current_screen.png")
+    img.save("screen_0.png")
 
 def scale_bbox(bbox): #adjusting params to track projection properly across my multiple-monitor setup
     bbox = list(bbox)
