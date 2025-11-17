@@ -17,8 +17,9 @@ import asyncio
 session = Session(profile_name="my-dev-profile")
 polly = session.client("polly")
 current_dir = os.getcwd()
-
-mixer.init(devicename = 'CABLE-C Input (VB-Audio Cable C)') # Initialize audio output with the correct device
+# mixer.init(devicename = 'Laptop Speaker (Realtek(R) Audio)')
+mixer.init(devicename = 'ヘッドホン (ZOOM H and F Series Async Audio)')
+# mixer.init(devicename = 'CABLE-C Input (VB-Audio Cable C)') # Initialize audio output with the correct device
 
 
 async def speak_polly_response(gemini_response):
